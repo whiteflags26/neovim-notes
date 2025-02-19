@@ -5,7 +5,12 @@ require('dotenv').config();
 
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: process.env.FRONTEND_URL, // Use the environment variable
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
 mongoose.connect(process.env.MONGODB_URI)
@@ -59,7 +64,7 @@ app.get('/test', (req, res) => {
     res.json({ message: 'API is working!' });
 });
 
-const PORT = process.env.PORT;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// const PORT = process.env.PORT;
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
