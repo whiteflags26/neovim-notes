@@ -1,74 +1,50 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
+const noteRouter = require('./routes/noteRoutes');
+const connectDB = require('./DB/connection');
+require('dotenv').config(); // Load environment variables
 
 const app = express();
 
+// CORS configuration
 const corsConfig = {
-  origin: process.env.Client_URL,
+  origin: process.env.FRONTEND_URL || '*', // Allow all origins if FRONTEND_URL is not set
   credentials: true,
-  method: ["GET", "POST", "PUT", "DELETE"],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
 };
 
-app.options("", cors(corsConfig));
+app.use(cors(corsConfig)); // Use CORS with the configuration
+app.options('*', cors(corsConfig)); // Enable preflight requests for all routes
 
-app.use(cors(corsConfig));
-
+// Middleware
 app.use(express.json());
 
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB Atlas'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// Routes
+app.use('/api/notes', noteRouter);
 
-const noteSchema = new mongoose.Schema({
-  content: String,
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+// Default route
+app.get('/', (req, res) => {
+  res.send('API running');
 });
 
-const Note = mongoose.model('Note', noteSchema);
-
-app.get('/api/notes', async (req, res) => {
-  try {
-    const notes = await Note.find().sort({ updatedAt: -1 });
-    res.json(notes);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
 });
 
-app.post('/api/notes', async (req, res) => {
-  const note = new Note({
-    content: req.body.content
-  });
-
-  try {
-    const newNote = await note.save();
-    res.status(201).json(newNote);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
-app.delete('/api/notes/:id', async (req, res) => {
-  try {
-    const deletedNote = await Note.findByIdAndDelete(req.params.id);
-    if (!deletedNote) {
-      return res.status(404).json({ message: 'Note not found' });
-    }
-    res.json({ message: 'Note deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-
-app.get("/", (req, res) => {
-  res.send("API running");
-});
-
+// Connect to MongoDB and start the server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await connectDB(); // Connect to the database
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1); // Exit the process if the server fails to start
+  }
+};
+
+startServer();
