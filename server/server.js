@@ -1,15 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const serverless = require('serverless-http'); // Add this
 require('dotenv').config();
 
 const app = express();
 
 const corsOptions = {
   origin: process.env.FRONTEND_URL, 
-  methods: 'GET,POST,DELETE',
-  credentials: true
+  methods: 'GET,POST,DELETE'
 };
 
 app.use(cors(corsOptions));
@@ -63,16 +61,11 @@ app.delete('/api/notes/:id', async (req, res) => {
 });
 
 
-app.get('/test', (req, res) => {
-    res.json({ message: 'API is working!' });
+app.get("/", (req, res) => {
+  res.send("API running");
 });
 
-module.exports.handler = serverless(app);
-
-// Local server (only runs when not in Vercel environment)
-if (require.main === module) {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
