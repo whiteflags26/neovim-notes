@@ -5,12 +5,15 @@ require('dotenv').config();
 
 const app = express();
 
-const corsOptions = {
-  origin: process.env.FRONTEND_URL, 
-  methods: 'GET,POST,DELETE'
+const corsConfig = {
+  origin: process.env.Client_URL,
+  credentials: true,
+  method: ["GET", "POST", "PUT", "DELETE"],
 };
 
-app.use(cors(corsOptions));
+app.options("", cors(corsConfig));
+
+app.use(cors(corsConfig));
 
 app.use(express.json());
 
@@ -65,7 +68,7 @@ app.get("/", (req, res) => {
   res.send("API running");
 });
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
