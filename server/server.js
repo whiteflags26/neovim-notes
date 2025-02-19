@@ -5,29 +5,26 @@ require('dotenv').config();
 
 const app = express();
 
-// CORS Configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL, // Use the environment variable for CORS
+  origin: process.env.FRONTEND_URL, // Use the environment variable
 };
+
 app.use(cors(corsOptions));
 
-// JSON parsing middleware
 app.use(express.json());
 
-// MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// Note Schema and Model
 const noteSchema = new mongoose.Schema({
   content: String,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
+
 const Note = mongoose.model('Note', noteSchema);
 
-// Routes
 app.get('/api/notes', async (req, res) => {
   try {
     const notes = await Note.find().sort({ updatedAt: -1 });
@@ -62,9 +59,12 @@ app.delete('/api/notes/:id', async (req, res) => {
   }
 });
 
+
 app.get('/test', (req, res) => {
-  res.json({ message: 'API is working!' });
+    res.json({ message: 'API is working!' });
 });
 
-// Export the handler for Vercel serverless function
-module.exports = app;
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
