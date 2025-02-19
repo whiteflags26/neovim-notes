@@ -7,6 +7,8 @@ const app = express();
 
 const corsOptions = {
   origin: process.env.FRONTEND_URL, // Use the environment variable
+  methods: 'GET,POST,DELETE',
+  credentials: true
 };
 
 app.use(cors(corsOptions));
