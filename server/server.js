@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const noteRouter = require('../server/routes/noteRoutes');
-const connectDB = require('../server/db/connection');
+const connectDB = require('./db/connection');
 require('dotenv').config(); // Load environment variables
 
 const app = express();
