@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const noteRouter = require('../server/routes/noteRoutes');
-const connectDB = require('../server/db/connection');
+const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables
 
 const app = express();
@@ -32,6 +32,20 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
+
+const connectDB = async () => {
+  try {
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI environment variable is not defined.');
+    }
+
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('Connected to MongoDB Atlas');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // Exit the process with a failure code
+  }
+};
 
 // Connect to MongoDB and start the server
 const PORT = process.env.PORT || 3000;
