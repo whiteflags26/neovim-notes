@@ -1,20 +1,20 @@
 const express = require('express');
 const cors = require('cors');
 const noteRouter = require('../server/routes/noteRoutes');
-const connectDB = require('../server/db/connection.js');
+const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables
 
 const app = express();
 
-// CORS configuration
 const corsConfig = {
-  origin: process.env.FRONTEND_URL || '*', // Allow all origins if FRONTEND_URL is not set
+  origin: ['https://neovim-notes-frontend.vercel.app/'], // Explicitly allow Vercel frontend
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS method explicitly
+  allowedHeaders: ['Content-Type', 'Authorization'], // Ensure correct headers are allowed
 };
 
-app.use(cors(corsConfig)); // Use CORS with the configuration
-app.options('*', cors(corsConfig)); // Enable preflight requests for all routes
+app.use(cors(corsConfig)); 
+app.options('*', cors(corsConfig));
 
 // Middleware
 app.use(express.json());
@@ -32,6 +32,20 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
+
+const connectDB = async () => {
+  try {
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI environment variable is not defined.');
+    }
+
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('Connected to MongoDB Atlas');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // Exit the process with a failure code
+  }
+};
 
 // Connect to MongoDB and start the server
 const PORT = process.env.PORT || 3000;
