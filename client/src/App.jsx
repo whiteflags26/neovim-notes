@@ -72,6 +72,11 @@ const App = () => {
           </div>
         </div>
 
+        {/* Display API Base URL */}
+        <div className="mb-4 p-3 bg-[#3c3836] rounded border border-[#504945] text-sm text-[#b8bb26]">
+          API Base URL: {API_BASE_URL || 'Not Set'}
+        </div>
+
         {/* Input Form */}
         <form onSubmit={handleSubmit} className="mb-6">
           <div className="flex flex-col space-y-2">
