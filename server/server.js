@@ -7,14 +7,14 @@ require('dotenv').config(); // Load environment variables
 const app = express();
 
 const corsConfig = {
-  origin: ['https://neovim-notes-frontend.vercel.app/'], // Explicitly allow Vercel frontend
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS method explicitly
-  allowedHeaders: ['Content-Type', 'Authorization'], // Ensure correct headers are allowed
+  origin: '*', // Allow all origins
+  credentials: true, // If you need credentials (like cookies or tokens)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow common methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers
 };
 
 app.use(cors(corsConfig)); 
-app.options('*', cors(corsConfig));
+app.options('*', cors(corsConfig)); // Handle OPTIONS preflight requests
 
 // Middleware
 app.use(express.json());
